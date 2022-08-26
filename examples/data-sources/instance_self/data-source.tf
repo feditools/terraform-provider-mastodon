@@ -1,0 +1,1 @@
+data "instance_self" "self" {}
