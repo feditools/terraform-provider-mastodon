@@ -17,7 +17,7 @@ var _ datasource.DataSource = instanceSelfDataSource{}
 
 type instanceSelfDataSourceType struct{}
 
-func (t instanceSelfDataSourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (t instanceSelfDataSourceType) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "Instance self",
@@ -76,7 +76,7 @@ type instanceSelfDataSourceData struct {
 }
 
 type instanceSelfDataSource struct {
-	provider scaffoldingProvider
+	provider mastodonProvider
 }
 
 func (d instanceSelfDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
@@ -89,7 +89,7 @@ func (d instanceSelfDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 
-	instance, err := d.provider.client.GetInstance(ctx)
+	instance, err := d.provider.newUnauthenticatedClient().GetInstance(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read example, got error: %s", err))
 
