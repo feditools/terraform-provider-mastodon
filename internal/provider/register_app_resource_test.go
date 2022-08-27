@@ -23,7 +23,17 @@ func TestAccRegisterAppResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccRegisterAppResourceConfig(ts.URL),
+				Config: testAccRegisterAppResourceConfig(ts.URL, "one"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("mastodon_register_app.test", "id", "563419"),
+					resource.TestCheckResourceAttr("mastodon_register_app.test", "app_config.client_id", "TWhM-tNSuncnqN7DBJmoyeLnk6K3iJJ71KKXxgL1hPM"),
+					resource.TestCheckResourceAttr("mastodon_register_app.test", "app_config.client_secret", "ZEaFUFmF0umgBX1qKJDjaU99Q31lDkOU8NutzTOoliw"),
+					resource.TestCheckResourceAttr("mastodon_register_app.test", "app_config.redirect_uri", "urn:ietf:wg:oauth:2.0:oob"),
+				),
+			},
+			// Create and Read testing
+			{
+				Config: testAccRegisterAppResourceConfig(ts.URL, "two"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("mastodon_register_app.test", "id", "563419"),
 					resource.TestCheckResourceAttr("mastodon_register_app.test", "app_config.client_id", "TWhM-tNSuncnqN7DBJmoyeLnk6K3iJJ71KKXxgL1hPM"),
@@ -42,9 +52,14 @@ provider "mastodon" {
 }
 
 resource "mastodon_register_app" "test" {
+    client_name = %[2]q
 }
 `
 
-func testAccRegisterAppResourceConfig(tsURL string) string {
-	return fmt.Sprintf(testAccRegisterAppResourceConfigTmplPre, strings.TrimPrefix(tsURL, "http://"))
+func testAccRegisterAppResourceConfig(tsURL string, clientName string) string {
+	return fmt.Sprintf(
+		testAccRegisterAppResourceConfigTmplPre,
+		strings.TrimPrefix(tsURL, "http://"),
+		clientName,
+	)
 }

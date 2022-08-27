@@ -91,7 +91,7 @@ func (d instanceSelfDataSource) Read(ctx context.Context, req datasource.ReadReq
 
 	instance, err := d.provider.newUnauthenticatedClient().GetInstance(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read example, got error: %s", err))
+		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read instance data, got error: %s", err))
 
 		return
 	}

@@ -6,7 +6,7 @@ import (
 )
 
 func (p *mastodonProvider) server() string {
-	return  p.schema + "://" + p.domain
+	return p.schema + "://" + p.domain
 }
 
 func (p *mastodonProvider) getAccessToken() string {
