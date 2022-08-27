@@ -18,8 +18,6 @@ import (
 var _ provider.ResourceType = registerAppResourceType{}
 var _ resource.Resource = registerAppResource{}
 
-//var _ resource.ResourceWithImportState = registerAppResource{}
-
 type registerAppResourceType struct{}
 
 func (t registerAppResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -84,7 +82,7 @@ type registerAppResourceData struct {
 	ClientName   types.String `tfsdk:"client_name"`
 	RedirectURIs types.String `tfsdk:"redirect_uris"`
 	Scopes       types.List   `tfsdk:"scopes"`
-	Website     types.String `tfsdk:"website"`
+	Website      types.String `tfsdk:"website"`
 
 	ID        types.String `tfsdk:"id"`
 	AppConfig types.Object `tfsdk:"app_config"`
@@ -195,7 +193,6 @@ func (r registerAppResource) Read(ctx context.Context, req resource.ReadRequest,
 		return
 	}
 
-
 	_, err = client.VerifyAppCredentials(ctx)
 	if err != nil {
 		if strings.HasPrefix("bad request: 401 Unauthorized:", err.Error()) {
@@ -298,11 +295,3 @@ func (r registerAppResource) Delete(ctx context.Context, req resource.DeleteRequ
 	}
 
 }
-
-func (r registerAppResource) doRegisterApp(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-
-}
-
-/*func (r registerAppResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
-}*/
