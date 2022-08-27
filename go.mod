@@ -6,7 +6,7 @@ require (
 	github.com/hashicorp/terraform-plugin-framework v0.11.1
 	github.com/hashicorp/terraform-plugin-log v0.7.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.21.0
-	github.com/mattn/go-mastodon v0.0.5
+	github.com/mattn/go-mastodon v0.0.6-0.20220827043559-7dfe81e233c6
 )
 
 require (
@@ -58,5 +58,3 @@ require (
 	google.golang.org/grpc v1.48.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 )
-
-replace github.com/mattn/go-mastodon => github.com/feditools/go-mastodon v0.0.0-20220826233324-032263d83aed
