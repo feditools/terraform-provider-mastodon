@@ -37,3 +37,5 @@ require (
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
+
+replace github.com/mattn/go-mastodon => github.com/feditools/go-mastodon v0.0.0-20220826233324-032263d83aed

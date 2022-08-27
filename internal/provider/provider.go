@@ -3,18 +3,19 @@ package provider
 import (
 	"context"
 	"fmt"
-
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/mattn/go-mastodon"
+	"sync"
 )
 
-var _ provider.Provider = &scaffoldingProvider{}
+var _ provider.Provider = &mastodonProvider{}
 
-type scaffoldingProvider struct {
-	client *mastodon.Client
+type mastodonProvider struct {
+	accessToken     string
+	accessTokenLock *sync.RWMutex
+	domain          string
 
 	configured bool
 	version    string
@@ -24,7 +25,7 @@ type providerData struct {
 	Domain types.String `tfsdk:"domain"`
 }
 
-func (p *scaffoldingProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
+func (p *mastodonProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
 	var data providerData
 	diags := req.Config.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
@@ -33,26 +34,24 @@ func (p *scaffoldingProvider) Configure(ctx context.Context, req provider.Config
 		return
 	}
 
-	p.client = mastodon.NewClient(&mastodon.Config{
-		Server: "https://" + data.Domain.Value,
-	})
-
+	p.accessTokenLock = &sync.RWMutex{}
+	p.domain = data.Domain.Value
 	p.configured = true
 }
 
-func (p *scaffoldingProvider) GetResources(ctx context.Context) (map[string]provider.ResourceType, diag.Diagnostics) {
+func (p *mastodonProvider) GetResources(_ context.Context) (map[string]provider.ResourceType, diag.Diagnostics) {
 	return map[string]provider.ResourceType{
-		//"scaffolding_example": instanceSelfResourceType{},
+		"mastodon_register_app": registerAppResourceType{},
 	}, nil
 }
 
-func (p *scaffoldingProvider) GetDataSources(ctx context.Context) (map[string]provider.DataSourceType, diag.Diagnostics) {
+func (p *mastodonProvider) GetDataSources(_ context.Context) (map[string]provider.DataSourceType, diag.Diagnostics) {
 	return map[string]provider.DataSourceType{
 		"mastodon_instance_self": instanceSelfDataSourceType{},
 	}, nil
 }
 
-func (p *scaffoldingProvider) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (p *mastodonProvider) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		Attributes: map[string]tfsdk.Attribute{
 			"domain": {
@@ -66,23 +65,23 @@ func (p *scaffoldingProvider) GetSchema(ctx context.Context) (tfsdk.Schema, diag
 
 func New(version string) func() provider.Provider {
 	return func() provider.Provider {
-		return &scaffoldingProvider{
+		return &mastodonProvider{
 			version: version,
 		}
 	}
 }
 
-func convertProviderType(in provider.Provider) (scaffoldingProvider, diag.Diagnostics) {
+func convertProviderType(in provider.Provider) (mastodonProvider, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	p, ok := in.(*scaffoldingProvider)
+	p, ok := in.(*mastodonProvider)
 
 	if !ok {
 		diags.AddError(
 			"Unexpected Provider Instance Type",
 			fmt.Sprintf("While creating the data source or resource, an unexpected provider type (%T) was received. This is always a bug in the provider code and should be reported to the provider developers.", p),
 		)
-		return scaffoldingProvider{}, diags
+		return mastodonProvider{}, diags
 	}
 
 	if p == nil {
@@ -90,7 +89,7 @@ func convertProviderType(in provider.Provider) (scaffoldingProvider, diag.Diagno
 			"Unexpected Provider Instance Type",
 			"While creating the data source or resource, an unexpected empty provider instance was received. This is always a bug in the provider code and should be reported to the provider developers.",
 		)
-		return scaffoldingProvider{}, diags
+		return mastodonProvider{}, diags
 	}
 
 	return *p, diags
