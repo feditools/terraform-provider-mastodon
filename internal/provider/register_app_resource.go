@@ -248,8 +248,6 @@ func (r registerAppResource) Update(ctx context.Context, req resource.UpdateRequ
 		scopes = sb.String()
 	}
 
-	server := "https://" + r.provider.domain
-
 	website := "https://github.com/feditools/terraform-provider-mastodon"
 	if !data.Website.IsNull() {
 		website = data.Website.Value
@@ -257,7 +255,7 @@ func (r registerAppResource) Update(ctx context.Context, req resource.UpdateRequ
 
 	// do registration
 	app, err := mastodon.RegisterApp(ctx, &mastodon.AppConfig{
-		Server:       server,
+		Server:       r.provider.server(),
 		ClientName:   clientName,
 		Scopes:       scopes,
 		Website:      website,
