@@ -53,6 +53,7 @@ func (p *mastodonProvider) GetResources(_ context.Context) (map[string]provider.
 
 func (p *mastodonProvider) GetDataSources(_ context.Context) (map[string]provider.DataSourceType, diag.Diagnostics) {
 	return map[string]provider.DataSourceType{
+		"mastodon_account":       accountDataSourceType{},
 		"mastodon_instance_self": instanceSelfDataSourceType{},
 	}, nil
 }
