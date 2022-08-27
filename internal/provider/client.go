@@ -5,6 +5,10 @@ import (
 	"github.com/mattn/go-mastodon"
 )
 
+func (p *mastodonProvider) server() string {
+	return  p.schema + "://" + p.domain
+}
+
 func (p *mastodonProvider) getAccessToken() string {
 	p.accessTokenLock.RLock()
 	defer p.accessTokenLock.RUnlock()
@@ -16,7 +20,7 @@ func (p *mastodonProvider) newAuthenticatedClient(ctx context.Context, clientID,
 	// use given access token
 	if accessToken != "" {
 		return mastodon.NewClient(&mastodon.Config{
-			Server:       "https://" + p.domain,
+			Server:       p.server(),
 			ClientID:     clientID,
 			ClientSecret: clientSecret,
 			AccessToken:  accessToken,
@@ -26,7 +30,7 @@ func (p *mastodonProvider) newAuthenticatedClient(ctx context.Context, clientID,
 	// check cache for access token
 	if cachedAccessToken := p.getAccessToken(); cachedAccessToken != "" {
 		return mastodon.NewClient(&mastodon.Config{
-			Server:       "https://" + p.domain,
+			Server:       p.server(),
 			ClientID:     clientID,
 			ClientSecret: clientSecret,
 			AccessToken:  cachedAccessToken,
@@ -37,7 +41,7 @@ func (p *mastodonProvider) newAuthenticatedClient(ctx context.Context, clientID,
 	defer p.accessTokenLock.Unlock()
 
 	client := mastodon.NewClient(&mastodon.Config{
-		Server:       "https://" + p.domain,
+		Server:       p.server(),
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 	})
@@ -54,6 +58,6 @@ func (p *mastodonProvider) newAuthenticatedClient(ctx context.Context, clientID,
 
 func (p *mastodonProvider) newUnauthenticatedClient() *mastodon.Client {
 	return mastodon.NewClient(&mastodon.Config{
-		Server: "https://" + p.domain,
+		Server: p.server(),
 	})
 }

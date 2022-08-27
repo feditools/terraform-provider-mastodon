@@ -45,7 +45,7 @@ func (t registerAppResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, d
 					ElemType: types.StringType,
 				},
 			},
-			"websites": {
+			"website": {
 				MarkdownDescription: "Website for registered application",
 				Optional:            true,
 				Type:                types.StringType,
@@ -84,7 +84,7 @@ type registerAppResourceData struct {
 	ClientName   types.String `tfsdk:"client_name"`
 	RedirectURIs types.String `tfsdk:"redirect_uris"`
 	Scopes       types.List   `tfsdk:"scopes"`
-	Websites     types.String `tfsdk:"websites"`
+	Website     types.String `tfsdk:"website"`
 
 	ID        types.String `tfsdk:"id"`
 	AppConfig types.Object `tfsdk:"app_config"`
@@ -130,16 +130,14 @@ func (r registerAppResource) Create(ctx context.Context, req resource.CreateRequ
 		scopes = sb.String()
 	}
 
-	server := "https://" + r.provider.domain
-
 	website := "https://github.com/feditools/terraform-provider-mastodon"
-	if !data.Websites.IsNull() {
-		website = data.Websites.Value
+	if !data.Website.IsNull() {
+		website = data.Website.Value
 	}
 
 	// do registration
 	app, err := mastodon.RegisterApp(ctx, &mastodon.AppConfig{
-		Server:       server,
+		Server:       r.provider.server(),
 		ClientName:   clientName,
 		Scopes:       scopes,
 		Website:      website,
@@ -253,8 +251,8 @@ func (r registerAppResource) Update(ctx context.Context, req resource.UpdateRequ
 	server := "https://" + r.provider.domain
 
 	website := "https://github.com/feditools/terraform-provider-mastodon"
-	if !data.Websites.IsNull() {
-		website = data.Websites.Value
+	if !data.Website.IsNull() {
+		website = data.Website.Value
 	}
 
 	// do registration

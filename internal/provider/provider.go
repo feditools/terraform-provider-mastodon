@@ -16,13 +16,15 @@ type mastodonProvider struct {
 	accessToken     string
 	accessTokenLock *sync.RWMutex
 	domain          string
+	schema          string
 
 	configured bool
 	version    string
 }
 
 type providerData struct {
-	Domain types.String `tfsdk:"domain"`
+	Domain   types.String `tfsdk:"domain"`
+	UseHTTPS types.Bool   `tfsdk:"use_https"`
 }
 
 func (p *mastodonProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
@@ -36,6 +38,10 @@ func (p *mastodonProvider) Configure(ctx context.Context, req provider.Configure
 
 	p.accessTokenLock = &sync.RWMutex{}
 	p.domain = data.Domain.Value
+	p.schema = "https"
+	if !data.UseHTTPS.IsNull() && !data.UseHTTPS.Value {
+		p.schema = "http"
+	}
 	p.configured = true
 }
 
@@ -56,8 +62,13 @@ func (p *mastodonProvider) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diag
 		Attributes: map[string]tfsdk.Attribute{
 			"domain": {
 				MarkdownDescription: "Domain",
-				Optional:            true,
+				Required:            true,
 				Type:                types.StringType,
+			},
+			"use_https": {
+				MarkdownDescription: "Should we use https to connect to the instance",
+				Optional:            true,
+				Type:                types.BoolType,
 			},
 		},
 	}, nil
