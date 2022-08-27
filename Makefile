@@ -12,6 +12,10 @@ default: install
 build:
 	go build -o ${BINARY}
 
+fmt:
+	@echo formatting
+	@go fmt $(TEST)
+
 release:
 	GOOS=darwin GOARCH=amd64 go build -o ./bin/${BINARY}_${VERSION}_darwin_amd64
 	GOOS=freebsd GOARCH=386 go build -o ./bin/${BINARY}_${VERSION}_freebsd_386
@@ -30,7 +34,7 @@ install: build
 	mkdir -p ~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${OS_ARCH}
 	mv ${BINARY} ~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${OS_ARCH}
 
-test:
+test: fmt
 	go test -i $(TEST) || exit 1
 	echo $(TEST) | TF_ACC=1 xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
 
