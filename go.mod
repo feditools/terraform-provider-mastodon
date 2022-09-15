@@ -6,7 +6,7 @@ require (
 	github.com/hashicorp/terraform-plugin-framework v0.12.0
 	github.com/hashicorp/terraform-plugin-go v0.14.0
 	github.com/hashicorp/terraform-plugin-log v0.7.0
-	github.com/hashicorp/terraform-plugin-sdk/v2 v2.22.0
+	github.com/hashicorp/terraform-plugin-sdk/v2 v2.23.0
 	github.com/mattn/go-mastodon v0.0.6-0.20220827043559-7dfe81e233c6
 )
 
